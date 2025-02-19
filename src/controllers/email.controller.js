@@ -84,7 +84,7 @@ const sendWelcomeEmail = asyncHandler(async (userEmail, userName) => {
                    <p>We're thrilled to have you as part of our fashion-forward community. At Luxora, we believe that style is a reflection of individuality, and we're here to help you express yours with our premium clothing collections.</p>
                    <p>As a valued member, you'll enjoy exclusive access to the latest trends, special offers, and personalized recommendations.</p>
                    <p>Start exploring now and elevate your wardrobe with Luxora’s finest pieces.</p>
-                   <p><a href="https://luxora.com" style="color: #d81b60; text-decoration: none; font-weight: bold;">Shop Now</a></p>
+                   <p><a href="https://luxora-shop.vercel.app" style="color: #d81b60; text-decoration: none; font-weight: bold;">Shop Now</a></p>
                    <p>Need assistance? Our support team is always here to help.</p>
                    <p>Best Regards,</p>
                    <p><strong>The Luxora Team</strong></p>
