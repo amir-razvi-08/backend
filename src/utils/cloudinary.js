@@ -1,7 +1,7 @@
 import { v2 as cloudinary } from "cloudinary";
-import { ApiError } from "./ApiError.js";
-import fs from "fs";
 import dotenv from "dotenv";
+import { Readable } from "stream";
+
 dotenv.config();
 
 cloudinary.config({
@@ -10,27 +10,27 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-
-const uploadOnCloudinary = async (localFilePath) => {
+const uploadOnCloudinary = async (fileBuffer, originalname) => {
     try {
-        if (!localFilePath) return null;
+        if (!fileBuffer) return null;
 
+        return new Promise((resolve, reject) => {
+            const stream = cloudinary.uploader.upload_stream(
+                {
+                    resource_type: "auto",
+                    folder: "luxora-images",
+                    public_id: originalname.split(".")[0],
+                },
+                (error, result) => {
+                    if (error) return reject(error);
+                    resolve(result);
+                }
+            );
 
-        const response = await cloudinary.uploader.upload(localFilePath, {
-            resource_type: "auto",
-            timeout: 120000,
+            Readable.from(fileBuffer).pipe(stream);
         });
-        if (!response) {
-            throw new ApiError(405, "Failed to uplaod & response not received");
-        }
-
-        fs.unlinkSync(localFilePath);
-        return response;
     } catch (error) {
-        if (fs.existsSync(localFilePath)) {
-            fs.unlinkSync(localFilePath);
-        }
-        throw new ApiError(499, "Failed to upload to Cloudinary");
+        throw new Error("Failed to upload to Cloudinary");
     }
 };
 
