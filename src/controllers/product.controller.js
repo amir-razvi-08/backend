@@ -19,9 +19,11 @@ const addProduct = asyncHandler(async (req, res) => {
         if (images.length === 0) {
             return res.status(400).json({ success: false, message: "At least one image is required" });
         }
+        console.log(images);
 
         const imagesData = await Promise.all(
             images.map(async (img) => {
+                console.log(img);
                 if (!img.path) {
                     throw new ApiError(400, "Invalid file path");
                 }
