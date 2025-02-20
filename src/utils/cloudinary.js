@@ -1,5 +1,4 @@
 import { v2 as cloudinary } from "cloudinary";
-import { ApiError } from "./ApiError.js";
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -9,21 +8,18 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-const uploadOnCloudinary = async (fileBuffer) => {
-    try {
-        if (!fileBuffer) return null;
+const uploadOnCloudinary = (fileBuffer, mimetype) => {
+    return new Promise((resolve, reject) => {
+        const uploadStream = cloudinary.uploader.upload_stream(
+            { resource_type: "auto", timeout: 120000 },
+            (error, result) => {
+                if (error) reject(new Error("Cloudinary upload failed"));
+                else resolve(result);
+            }
+        );
 
-        const response = await cloudinary.uploader
-            .upload_stream({ resource_type: "auto", timeout: 120000 }, (error, result) => {
-                if (error) throw new ApiError(499, "Cloudinary upload failed");
-                return result;
-            })
-            .end(fileBuffer);
-
-        return response;
-    } catch (error) {
-        throw new ApiError(499, "Failed to upload to Cloudinary");
-    }
+        uploadStream.end(fileBuffer); // Send file buffer to Cloudinary
+    });
 };
 
 export { uploadOnCloudinary };

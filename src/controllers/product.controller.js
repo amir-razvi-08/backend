@@ -14,21 +14,21 @@ const addProduct = asyncHandler(async (req, res) => {
             return res.status(400).json({ success: false, message: "No images uploaded" });
         }
 
-        const images = ["image1", "image2", "image3", "image4"].map((key) => req.files[key]?.[0]).filter(Boolean);
+        const images = ["image1", "image2", "image3", "image4"]
+            .map((key) => req.files[key]?.[0])
+            .filter(Boolean);
 
         if (images.length === 0) {
             return res.status(400).json({ success: false, message: "At least one image is required" });
         }
-        console.log(images);
 
         const imagesData = await Promise.all(
             images.map(async (img) => {
-                console.log(img);
-                if (!img.path) {
-                    throw new ApiError(400, "Invalid file path");
+                if (!img.buffer) {
+                    throw new ApiError(400, "Invalid file buffer");
                 }
 
-                const result = await uploadOnCloudinary(img.path);
+                const result = await uploadOnCloudinary(img.buffer, img.mimetype);
 
                 if (!result?.secure_url) {
                     throw new ApiError(500, "Image upload failed");
@@ -69,6 +69,7 @@ const addProduct = asyncHandler(async (req, res) => {
         return res.status(500).json({ success: false, message: error.message });
     }
 });
+
 
 const handleAllProducts = asyncHandler(async (req, res) => {
     const products = await Product.find();
