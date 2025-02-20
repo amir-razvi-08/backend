@@ -1,4 +1,5 @@
 import { v2 as cloudinary } from "cloudinary";
+import { ApiError } from "./ApiError.js";
 import dotenv from "dotenv";
 import { Readable } from "stream";
 
@@ -30,7 +31,7 @@ const uploadOnCloudinary = async (fileBuffer, originalname) => {
             Readable.from(fileBuffer).pipe(stream);
         });
     } catch (error) {
-        throw new Error("Failed to upload to Cloudinary");
+        throw new ApiError("Failed to upload to Cloudinary");
     }
 };
 

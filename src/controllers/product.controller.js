@@ -7,43 +7,65 @@ import mongoose from "mongoose";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 
 const addProduct = asyncHandler(async (req, res) => {
-    const { name, description, price, category, subCategory, sizes, discount, bestseller } = req.body;
+    try {
+        const { name, description, price, category, subCategory, sizes, discount, bestseller } = req.body;
 
-    const images = [req.files.image1, req.files.image2, req.files.image3, req.files.image4].filter(Boolean).map((fileArray) => fileArray[0]);
+        if (!req.files || Object.keys(req.files).length === 0) {
+            return res.status(400).json({ success: false, message: "No images uploaded" });
+        }
 
-    const imagesData = await Promise.all(
-        images.map(async (img) => {
-            const result = await uploadOnCloudinary(img.path);
+        const images = ["image1", "image2", "image3", "image4"].map((key) => req.files[key]?.[0]).filter(Boolean);
 
-            return {
-                url: result.secure_url,
-                public_id: result.public_id,
-            };
-        })
-    );
-    const discountPrice = Math.round((price * 100 - price * discount) / 100);
+        if (images.length === 0) {
+            return res.status(400).json({ success: false, message: "At least one image is required" });
+        }
 
-    const productData = {
-        name,
-        description,
-        price: Number(price),
-        category,
-        subCategory,
-        discount: discount ? Number(discount) : 0,
-        discountPrice: Number(discountPrice),
-        sizes: JSON.parse(sizes),
-        bestseller: bestseller === "true",
-        image: imagesData,
-        date: Date.now(),
-    };
+        const imagesData = await Promise.all(
+            images.map(async (img) => {
+                if (!img.path) {
+                    throw new ApiError(400, "Invalid file path");
+                }
 
-    const product = await Product.create(productData);
+                const result = await uploadOnCloudinary(img.path);
 
-    if (!product) {
-        throw new ApiError(500, "Product creation failed");
+                if (!result?.secure_url) {
+                    throw new ApiError(500, "Image upload failed");
+                }
+
+                return {
+                    url: result.secure_url,
+                    public_id: result.public_id,
+                };
+            })
+        );
+
+        const discountPrice = Math.round((price * 100 - price * discount) / 100);
+
+        const productData = {
+            name,
+            description,
+            price: Number(price),
+            category,
+            subCategory,
+            discount: discount ? Number(discount) : 0,
+            discountPrice: Number(discountPrice),
+            sizes: JSON.parse(sizes),
+            bestseller: bestseller === "true",
+            image: imagesData,
+            date: Date.now(),
+        };
+
+        const product = await Product.create(productData);
+
+        if (!product) {
+            throw new ApiError(500, "Product creation failed");
+        }
+
+        return res.status(201).json(new ApiResponse(201, product, "Product added successfully"));
+    } catch (error) {
+        console.error("Error adding product:", error);
+        return res.status(500).json({ success: false, message: error.message });
     }
-
-    return res.status(201).json(new ApiResponse(201, product, "Product added successfully"));
 });
 
 const handleAllProducts = asyncHandler(async (req, res) => {
