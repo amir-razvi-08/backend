@@ -171,7 +171,7 @@ const generateOtp = asyncHandler(async (req, res) => {
     if (!response) throw new ApiError(404, "User not found");
 
     try {
-        await sendOtp(email, otp);
+         sendOtp(email, otp);
         res.status(200).json(new ApiResponse(200, {}, "OTP sent successfully"));
     } catch (error) {
         console.error("OTP email error:", error);
