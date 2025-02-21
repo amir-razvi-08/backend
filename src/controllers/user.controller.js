@@ -162,21 +162,16 @@ const generateOtp = asyncHandler(async (req, res) => {
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     const otpExpiry = new Date(Date.now() + 120000);
 
-    const response = await User.findOneAndUpdate(
-        { email },
-        { otp, otpExpiry },
-        { upsert: true, new: true }
-    );
-    
+    const response = await User.findOneAndUpdate({ email }, { otp, otpExpiry }, { upsert: true, new: true });
     if (!response) throw new ApiError(404, "User not found");
 
     try {
-         sendOtp(email, otp);
-        res.status(200).json(new ApiResponse(200, {}, "OTP sent successfully"));
+        sendOtp(email, otp);
     } catch (error) {
-        console.error("OTP email error:", error);
-        throw new ApiError(500, "Failed to send OTP");
+        throw new ApiError(400, "Failed to send OTP");
     }
+
+    res.status(200).json(new ApiResponse(200, {}, "OTP sent successfully"));
 });
 
 
