@@ -10,11 +10,4 @@ router.route('/logout').post(verifyJWT,logoutUser);
 router.route('/verify-otp').post(verifyOtp);
 router.route('/reset-password').post(resetPassword);
 router.route('/generate-otp').post(generateOtp);
-
-
-
-
-
-
-
 export default router;
