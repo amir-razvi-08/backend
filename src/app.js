@@ -8,6 +8,8 @@ app.use(
     cors({
         origin: process.env.CORS_ORIGIN,
         credentials: true,
+        methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        allowedHeaders: ["Content-Type", "Authorization"],
     })
 );
 
@@ -21,14 +23,14 @@ import productRouter from "./routes/product.route.js";
 import cartRouter from "./routes/cart.route.js";
 import orderRouter from "./routes/order.route.js";
 import adminRouter from "./routes/admin.route.js";
-import emailRouter from "./routes/email.route.js"
+import emailRouter from "./routes/email.route.js";
 app.use("/api/v1/admin", adminRouter);
 
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/products", productRouter);
 app.use("/api/v1/carts", cartRouter);
 app.use("/api/v1/orders", orderRouter);
-app.use("/api/v1/email",emailRouter);
+app.use("/api/v1/email", emailRouter);
 
 app.use((err, req, res, next) => {
     res.status(err.statusCode || 500).json({
