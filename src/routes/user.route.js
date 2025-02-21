@@ -8,11 +8,9 @@ router.use(
     cors({
         origin: "https://luxora-shop.vercel.app",
         credentials: true,
-    })
+    }),
+    generateOtp
 );
-
-router.post("/generate-otp", generateOtp);
-
 
 const router = Router();
 
