@@ -170,8 +170,8 @@ const generateOtp = asyncHandler(async (req, res) => {
         await sendOtp(email, otp);
         console.log("OTP sent successfully");
     } catch (error) {
-        throw new ApiError(400, "Failed to send OTP");
         console.log(error);
+        throw new ApiError(400, "Failed to send OTP");
     }
 
     res.status(200).json(new ApiResponse(200, {}, "OTP sent successfully"));
