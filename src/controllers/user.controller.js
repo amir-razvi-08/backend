@@ -161,13 +161,15 @@ const generateOtp = asyncHandler(async (req, res) => {
 
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     const otpExpiry = new Date(Date.now() + 120000);
+    console.log(otp, otpExpiry);
 
     const response = await User.findOneAndUpdate({ email }, { otp, otpExpiry }, { upsert: true, new: true });
+    console.log(response);
     if (!response) throw new ApiError(404, "User not found");
 
     try {
         console.log(email, otp);
-        await sendOtp(email, otp);
+        sendOtp(email, otp);
         console.log("OTP sent successfully");
     } catch (error) {
         console.log(error);
